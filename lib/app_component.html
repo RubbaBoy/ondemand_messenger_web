@@ -1,0 +1,25 @@
+<div class="col-sm-11 col-md-7 col-lg-5 d-flex justify-content-center top-align flex-column">
+    <div>
+        <div class="row col-12 mx-0 px-0">
+            <div class="input-group" style="padding-right: 0;">
+                <input #numberInput type="tel" class="form-control" placeholder="(123) 456-7890">
+            </div>
+        </div>
+        <div class="row col-12 mt-2 mx-0 px-0">
+            <div class="input-group" style="padding-left: 0;">
+                <textarea #messageInput class="form-control" placeholder="Message"></textarea>
+            </div>
+        </div>
+
+        <div class="row col-12 mt-2 mx-0 px-0">
+            <button type="button" class="btn btn-primary vcenter" (click)="send(numberInput.value, messageInput.value)">Send</button>
+        </div>
+
+        <div *ngFor="let message of messages" [class.alert-primary]="message.success" [class.alert-warning]="!message.success" class="alert mt-3" role="alert" (click)="setValues(message, numberInput, messageInput)">
+            {{ message.number | phoneNumber }}
+            <span class="separator"></span>
+            {{ message.message }}
+        </div>
+    </div>
+
+</div>

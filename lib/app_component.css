@@ -1,0 +1,23 @@
+:host {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.separator {
+    border-right: 1px solid #ced4da;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 0 9px 0 5px;
+}
+
+.top-align {
+    position: absolute;
+    top: 25vh;
+}
+
+.alert {
+    cursor: pointer;
+}
