@@ -11,9 +11,64 @@
             </div>
         </div>
 
-        <div class="row col-12 mt-2 mx-0 px-0">
-            <button type="button" class="btn btn-primary vcenter" (click)="send(numberInput.value, messageInput.value)">Send</button>
+        <div class="row col-12 my-2 mx-0 px-0">
+            <button type="button" class="btn btn-primary vcenter" (click)="send(numberInput.value, messageInput.value)">
+                Send
+            </button>
+            <button type="button" class="btn btn-link vcenter" (click)="toggleBook()">{{ showingBook ? 'Hide' : 'Show'
+                }} Address Book
+            </button>
+            <button *ngIf="loggedIn" type="button" class="btn btn-link vcenter" (click)="logOut()">(Log Out)</button>
         </div>
+
+        <template [ngIf]="showingBook">
+            <template [ngIf]="!loggedIn">
+                <div class="row col-12 mx-0 px-0">
+                    <div class="col-sm-6 col-12 px-0 pr-sm-2">
+                        <input #bookName type="text" class="form-control" placeholder="Address Book Name" (keyup)="loginSubmit($event, loginButton)">
+                    </div>
+                    <div class="col-sm-6 col-12 px-0 pt-2 pt-sm-0">
+                        <input #bookPassword type="password" class="form-control" placeholder="Password" (keyup)="loginSubmit($event, loginButton)">
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <button #loginButton type="button" class="btn btn-primary vcenter mr-2" (click)="loginBook(bookName.value, bookPassword.value)">
+                        Login
+                    </button>
+                    <button type="button" class="btn btn-primary vcenter" (click)="createBook(bookName.value, bookPassword.value)">
+                        Create
+                    </button>
+                </div>
+            </template>
+
+            <template [ngIf]="loggedIn">
+                <div *ngFor="let number of numbers" class="alert alert-primary col-12 p-0" role="alert">
+                    <div class="alert-padding" (click)="setNumber(number.number, numberInput)">
+                        {{ number.name }}
+                        <span class="separator"></span>
+                        {{ number.number | phoneNumber }}
+                    </div>
+                    <button type="button" class="close alert-close" (click)="removeNumber(number)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="row mx-0 px-0 p-0">
+                    <input #addingName type="text" class="form-control col-5" placeholder="Name">
+                    <div class="col-5 px-2">
+                        <input #addingNumber type="tel" class="form-control" placeholder="Number">
+                    </div>
+                    <button type="button" class="btn btn-primary vcenter col-2" (click)="addNumber(addingName, addingNumber)">
+                        Add
+                    </button>
+                </div>
+            </template>
+
+            <div *ngIf="error" class="alert alert-danger mt-2" role="alert">
+                {{ errorMessage }}
+            </div>
+        </template>
 
         <div *ngFor="let message of messages" [class.alert-primary]="message.success" [class.alert-warning]="!message.success" class="alert mt-3" role="alert" (click)="setValues(message, numberInput, messageInput)">
             {{ message.number | phoneNumber }}

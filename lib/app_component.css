@@ -21,3 +21,13 @@
 .alert {
     cursor: pointer;
 }
+
+.alert-padding {
+    padding: .75rem 4rem .75rem 1.25rem;
+    display: inline-block;
+    width: calc(100% - 60px);
+}
+
+.alert-close {
+    padding: .75rem 1.25rem;
+}
