@@ -16,6 +16,7 @@
 .top-align {
     position: absolute;
     top: 25vh;
+    padding-bottom: 25vh;
 }
 
 .alert {
