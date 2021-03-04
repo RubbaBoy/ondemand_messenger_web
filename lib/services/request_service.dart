@@ -12,10 +12,22 @@ class RequestService {
 
   RequestService(this._captchaVerification);
 
+  // TODO: Proper errors and loading indicators
+
   Future<void> requestToken(String name, String password) async {
-    var token = postRequest('https://ondemand.yarr.is/requestToken',
+    var res = await postRequest('https://ondemand.yarr.is/requestToken',
         {'name': name, 'password': password});
-    print((await token).body);
+    var tokenHeader = res.headers['x-token']?.split(';');
+    if (tokenHeader == null) {
+      print('Couldn\'t get token');
+      print(res.body);
+      return;
+    }
+
+    var token = tokenHeader[0];
+    var expiryUTC = tokenHeader[1];
+
+    CookieUtil.setCookie('token', token, expiryDateTime: expiryUTC);
   }
 
   Future<Map<String, dynamic>> bookRequest(
