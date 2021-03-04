@@ -33,8 +33,6 @@ class AppComponent implements OnInit {
   bool showingBook = false;
   bool loggedIn = false;
 
-  String name;
-  String password;
   int bookId;
   List<Number> numbers = [];
 
@@ -42,24 +40,30 @@ class AppComponent implements OnInit {
 
   @override
   Future<void> ngOnInit() async {
-    var username = CookieUtil.getCookie('username') ?? '';
-    var password = CookieUtil.getCookie('password') ?? '';
+    _requestService.init(showError);
+    var token = CookieUtil.getCookie('token') ?? '';
 
-    if (username != '' && password != '') {
-      loggedIn = true;
-      showingBook = true;
-      await loginBook(name = username, this.password = password);
+    if (token != '') {
+      if (await loginBook(token)) {
+        loggedIn = true;
+        showingBook = true;
+      }
     }
   }
 
   void send(String number, String message) {
-    _requestService.postRequest('https://ondemand.yarr.is/sendSMS',
-            {
-              'number': number,
-              'message': message,
-            })
-        .then((res) => messages.insert(
-            0, SentMessage(number, message, res.statusCode == 200)));
+    try {
+      _requestService.postRequest('https://ondemand.yarr.is/sendSMS',
+          {
+            'number': number,
+            'message': message,
+          })
+          .then((res) =>
+          messages.insert(
+              0, SentMessage(number, message, res.statusCode == 200)));
+    } catch (e) {
+      showError('Unable to send message: $e');
+    }
   }
 
   void setValues(SentMessage message, InputElement numberInput,
@@ -83,71 +87,87 @@ class AppComponent implements OnInit {
     numbers.clear();
   }
 
-  Future<void> loginBook(String name, String password) async {
-    this.name = name;
-    this.password = password;
-
-    print('$name:$password');
-
-    await _requestService.requestToken(name, password);
-
-    var res = await _requestService.bookRequest('https://ondemand.yarr.is/getBook', {});
-    print(res);
-    if (res == null) {
-      return;
+  Future<void> requestToken(String name, String password) async {
+    if (await _requestService.requestToken(name, password)) {
+      loggedIn = true;
+      showingBook = true;
+      await loginBook(CookieUtil.getCookie('token'));
     }
+  }
 
-    setCredentials(name, password);
+  /// Logs in the user to the book with the given [token]. Returns if this login
+  /// was successful.
+  Future<bool> loginBook(String token) async {
+    try {
+      var res = await _requestService.bookRequest(
+          'https://ondemand.yarr.is/getBook');
+      print(res);
+      if (res == null) {
+        return false;
+      }
 
-    numbers.clear();
-    for (var number in res['numbers']) {
-      numbers.add(Number(number['numberId'], number['name'], number['number']));
+      numbers.clear();
+      for (var number in res['numbers']) {
+        numbers.add(
+            Number(number['numberId'], number['name'], number['number']));
+      }
+      return true;
+    } catch (e) {
+      showError('Unable to get book: $e');
+      return false;
     }
   }
 
   Future<void> createBook(String name, String password) async {
-    this.name = name;
-    this.password = password;
 
-    var res = await _requestService.bookRequest('https://ondemand.yarr.is/createBook', {});
-    if (res == null) {
-      return;
+    try {
+      var res = await _requestService.postRequest(
+          'https://ondemand.yarr.is/createBook', {
+        'name': name,
+        'password': password
+      });
+      if (res == null) {
+        return;
+      }
+
+      showingBook = true;
+      loggedIn = true;
+    } catch (e) {
+      showError('Unable to create book: $e');
     }
-
-    showingBook = true;
-    setCredentials(name, password);
   }
 
   Future<void> removeNumber(Number number) async {
-    var res = await _requestService.bookRequest('https://ondemand.yarr.is/removeNumber',
-        {'numberId': number.numberId});
-    if (res == null) {
-      return;
-    }
+    try {
+      var res = await _requestService.bookRequest(
+          'https://ondemand.yarr.is/removeNumber',
+          body: {'numberId': number.numberId});
+      if (res == null) {
+        return;
+      }
 
-    numbers.remove(number);
+      numbers.remove(number);
+    } catch (e) {
+      showError('Unable to remove number: $e');
+    }
   }
 
   Future<void> addNumber(TextInputElement nameInput, TextInputElement numberInput) async {
-    var res = await _requestService.bookRequest('https://ondemand.yarr.is/addNumber',
-        {'numberName': nameInput.value, 'number': numberInput.value});
+    try {
+      var res = await _requestService.bookRequest(
+          'https://ondemand.yarr.is/addNumber',
+          body: {'numberName': nameInput.value, 'number': numberInput.value});
 
-    if (res == null) {
-      return;
+      if (res == null) {
+        return;
+      }
+
+      nameInput.value = '';
+      numberInput.value = '';
+      numbers.add(Number.fromJson(res['number']));
+    } catch (e) {
+      showError('Unable to add number: $e');
     }
-
-    nameInput.value = '';
-    numberInput.value = '';
-    numbers.add(Number.fromJson(res['number']));
-  }
-
-
-
-  void setCredentials(String name, String password) {
-    CookieUtil.setCookie('username', name);
-    CookieUtil.setCookie('password', password);
-
-    loggedIn = true;
   }
 
   void loginSubmit(KeyboardEvent event, ButtonElement button) {
