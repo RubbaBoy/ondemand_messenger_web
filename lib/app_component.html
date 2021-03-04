@@ -72,6 +72,12 @@
             <hr>
         </template>
 
+        <div class="g-recaptcha"
+             data-sitekey="6Ld1i3AaAAAAABN3sNSlYbOewP9lkaPHNEuhePte"
+             data-callback="callback"
+             data-size="invisible">
+        </div>
+
         <div *ngFor="let message of messages" [class.alert-primary]="message.success" [class.alert-warning]="!message.success" class="alert mt-3" role="alert" (click)="setValues(message, numberInput, messageInput)">
             {{ message.number | phoneNumber }}
             <span class="separator"></span>

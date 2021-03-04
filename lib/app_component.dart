@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'dart:js';
 
-import 'package:LakWebsite/cookie_util.dart';
 import 'package:LakWebsite/phone_pipe.dart';
+import 'package:LakWebsite/services/captcha_verification.dart';
+import 'package:LakWebsite/services/request_service.dart';
+import 'package:LakWebsite/utils/cookie_util.dart';
 import 'package:angular/angular.dart';
-import 'package:http/http.dart' as http;
 
 @Component(
   selector: 'my-app',
@@ -14,9 +16,17 @@ import 'package:http/http.dart' as http;
   directives: [
     coreDirectives,
   ],
+  providers: [
+    ClassProvider(CaptchaVerification),
+    ClassProvider(RequestService),
+  ],
   pipes: [PhoneNumberPipe],
 )
 class AppComponent implements OnInit {
+
+  final CaptchaVerification _captchaVerification;
+  final RequestService _requestService;
+
   final messages = <SentMessage>[];
   String errorMessage;
   bool error = false;
@@ -27,6 +37,8 @@ class AppComponent implements OnInit {
   String password;
   int bookId;
   List<Number> numbers = [];
+
+  AppComponent(this._captchaVerification, this._requestService);
 
   @override
   Future<void> ngOnInit() async {
@@ -41,12 +53,11 @@ class AppComponent implements OnInit {
   }
 
   void send(String number, String message) {
-    http
-        .post('https://ondemand.yarr.is/sendSMS',
-            body: jsonEncode({
+    _requestService.postRequest('https://ondemand.yarr.is/sendSMS',
+            {
               'number': number,
               'message': message,
-            }))
+            })
         .then((res) => messages.insert(
             0, SentMessage(number, message, res.statusCode == 200)));
   }
@@ -77,7 +88,10 @@ class AppComponent implements OnInit {
     this.password = password;
 
     print('$name:$password');
-    var res = await bookRequest('https://ondemand.yarr.is/getBook', {});
+
+    await _requestService.requestToken(name, password);
+
+    var res = await _requestService.bookRequest('https://ondemand.yarr.is/getBook', {});
     print(res);
     if (res == null) {
       return;
@@ -95,7 +109,7 @@ class AppComponent implements OnInit {
     this.name = name;
     this.password = password;
 
-    var res = await bookRequest('https://ondemand.yarr.is/createBook', {});
+    var res = await _requestService.bookRequest('https://ondemand.yarr.is/createBook', {});
     if (res == null) {
       return;
     }
@@ -105,7 +119,7 @@ class AppComponent implements OnInit {
   }
 
   Future<void> removeNumber(Number number) async {
-    var res = await bookRequest('https://ondemand.yarr.is/removeNumber',
+    var res = await _requestService.bookRequest('https://ondemand.yarr.is/removeNumber',
         {'numberId': number.numberId});
     if (res == null) {
       return;
@@ -115,7 +129,7 @@ class AppComponent implements OnInit {
   }
 
   Future<void> addNumber(TextInputElement nameInput, TextInputElement numberInput) async {
-    var res = await bookRequest('https://ondemand.yarr.is/addNumber',
+    var res = await _requestService.bookRequest('https://ondemand.yarr.is/addNumber',
         {'numberName': nameInput.value, 'number': numberInput.value});
 
     if (res == null) {
@@ -127,21 +141,7 @@ class AppComponent implements OnInit {
     numbers.add(Number.fromJson(res['number']));
   }
 
-  Future<Map<String, dynamic>> bookRequest(
-      String url, Map<String, dynamic> body) async {
-    var response = await http.post(url,
-        body: jsonEncode({'name': name, 'password': password, ...body}));
-    var json = jsonDecode(response.body);
 
-    if (json.containsKey('error')) {
-      print('Error on request to "$url":');
-      print(json['error']);
-      showError('Error: ${json['error']}');
-      return null;
-    }
-
-    return json;
-  }
 
   void setCredentials(String name, String password) {
     CookieUtil.setCookie('username', name);
