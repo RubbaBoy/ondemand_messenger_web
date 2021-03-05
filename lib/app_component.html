@@ -12,16 +12,18 @@
         </div>
 
         <div class="row col-12 my-2 mx-0 px-0">
-            <button type="button" class="btn btn-primary vcenter" (click)="send(numberInput.value, messageInput.value)">
+            <button type="button" class="btn btn-primary vcenter" (click)="send(numberInput.value, messageInput.value)" [disabled]="loading">
                 Send
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
             </button>
             <button type="button" class="btn btn-link vcenter" (click)="toggleBook()">{{ showingBook ? 'Hide' : 'Show'
                 }} Address Book
             </button>
             <button *ngIf="loggedIn" type="button" class="btn btn-link vcenter" (click)="logOut()">(Log Out)</button>
+            <div *ngIf="loading" class="ml-auto mr-2">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         </div>
 
         <template [ngIf]="showingBook">
@@ -36,10 +38,10 @@
                 </div>
 
                 <div class="mt-2">
-                    <button #loginButton type="button" class="btn btn-primary vcenter mr-2" (click)="requestToken(bookName.value, bookPassword.value)">
+                    <button #loginButton type="button" class="btn btn-primary vcenter mr-2" (click)="requestToken(bookName.value, bookPassword.value)" [disabled]="loading">
                         Login
                     </button>
-                    <button type="button" class="btn btn-primary vcenter" (click)="createBook(bookName.value, bookPassword.value)">
+                    <button type="button" class="btn btn-primary vcenter" (click)="createBook(bookName.value, bookPassword.value)" [disabled]="loading">
                         Create
                     </button>
                 </div>
@@ -52,7 +54,7 @@
                         <span class="separator"></span>
                         {{ number.number | phoneNumber }}
                     </div>
-                    <button type="button" class="close alert-close" (click)="removeNumber(number)">
+                    <button type="button" class="close alert-close" (click)="removeNumber(number)" [disabled]="loading">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -62,7 +64,7 @@
                     <div class="col-5 px-2">
                         <input #addingNumber type="tel" class="form-control" placeholder="Number">
                     </div>
-                    <button type="button" class="btn btn-primary vcenter col-2" (click)="addNumber(addingName, addingNumber)">
+                    <button type="button" class="btn btn-primary vcenter col-2" (click)="addNumber(addingName, addingNumber)" [disabled]="loading">
                         Add
                     </button>
                 </div>
