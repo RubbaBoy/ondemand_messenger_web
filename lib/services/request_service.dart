@@ -28,7 +28,6 @@ class RequestService {
         {'name': name, 'password': password});
     if (!setToken(res.headers)) {
       error('Invalid credentials');
-      print(res.body);
       return false;
     }
 
@@ -52,10 +51,8 @@ class RequestService {
   Future<Map<String, dynamic>> bookRequest(
       String url, {Map<String, dynamic> body = const {}, int iterations = 0}) async {
     var token = CookieUtil.getCookie('token');
-    print('book request = $token');
     var response = await postRequest(url, {'token': token, ...body});
     var json = jsonDecode(response.body);
-    print('json = $json');
 
     if (response.statusCode == 401) {
       error('Book session expired');
@@ -74,22 +71,17 @@ class RequestService {
   /// Makes a post request with reCaptcha enabled. This should be used with
   /// every request.
   Future<Response> postRequest(String url, Map<String, dynamic> body) async {
-    print('111');
     var captchaToken = await _captchaVerification.getCaptchaToken();
-    print('222: $captchaToken');
 
     var response = await http.post(url,
         body: jsonEncode({'captchaToken': captchaToken, ...body}));
     var json = jsonDecode(response.body);
-    print('333: $json');
 
     if (json.containsKey('error')) {
       print('Error on request to "$url":');
       print(json['error']);
       throw json['error'];
     }
-
-    print('headers: ${response.headers}');
 
     // If this was a request that responded with a token header, set it as the
     // token.
@@ -98,11 +90,3 @@ class RequestService {
     return response;
   }
 }
-
-// class JsonResponse {
-//   final Response response;
-//   final Map<String, dynamic> json;
-//
-//   // JsonResponse(Request request) : json = request.body
-//
-// }

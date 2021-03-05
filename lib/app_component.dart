@@ -44,11 +44,9 @@ class AppComponent implements OnInit {
     _captchaVerification.init();
     _requestService.init(showError);
     var token = CookieUtil.getCookie('token') ?? '';
-    print('Token = $token');
 
     if (token != '') {
       if (await loginBook(token)) {
-        print('Logged in!');
         loggedIn = true;
         showingBook = true;
       }
@@ -105,11 +103,8 @@ class AppComponent implements OnInit {
   Future<bool> loginBook(String token) async {
     loading = true;
     try {
-      print('getBook!');
       var res = await _requestService.bookRequest(
           'https://ondemand.yarr.is/getBook');
-      print('afterrrr!');
-      print(res);
       if (res == null) {
         return false;
       }
