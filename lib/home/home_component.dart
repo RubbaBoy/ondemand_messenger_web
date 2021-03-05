@@ -117,7 +117,6 @@ class HomeComponent implements OnInit {
       }
       return true;
     } catch (e) {
-      print('errorrrrr $e');
       showError('Unable to get book: $e');
       return false;
     } finally {
