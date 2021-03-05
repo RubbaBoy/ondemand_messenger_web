@@ -69,11 +69,13 @@
                     </button>
                 </div>
             </template>
+            <hr *ngIf="!error">
+        </template>
 
-            <div *ngIf="error" class="alert alert-danger mt-2" role="alert">
+        <template [ngIf]="error">
+            <div class="alert alert-danger mt-2" role="alert">
                 {{ errorMessage }}
             </div>
-
             <hr>
         </template>
 

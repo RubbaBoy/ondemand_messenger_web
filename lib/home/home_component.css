@@ -15,6 +15,7 @@
 .top-align {
     margin-top: 25vh;
     margin-bottom: auto;
+    padding-bottom: calc(50px + 2rem);
 }
 
 .alert {

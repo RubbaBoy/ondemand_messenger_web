@@ -106,6 +106,7 @@ class HomeComponent implements OnInit {
       var res = await _requestService.bookRequest(
           'https://ondemand.yarr.is/getBook');
       if (res == null) {
+        CookieUtil.setCookie('token', '');
         return false;
       }
 
@@ -116,6 +117,7 @@ class HomeComponent implements OnInit {
       }
       return true;
     } catch (e) {
+      print('errorrrrr $e');
       showError('Unable to get book: $e');
       return false;
     } finally {

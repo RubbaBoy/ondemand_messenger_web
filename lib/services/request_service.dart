@@ -13,9 +13,6 @@ class RequestService {
 
   RequestService(this._captchaVerification);
 
-  // TODO: Proper errors and loading indicators
-  // TODO: Request a new book token if it's expired
-
   void error(String error) => errorHandler?.call(error);
 
   void init(Function(String) errorHandler) {
@@ -51,11 +48,15 @@ class RequestService {
   Future<Map<String, dynamic>> bookRequest(
       String url, {Map<String, dynamic> body = const {}, int iterations = 0}) async {
     var token = CookieUtil.getCookie('token');
-    var response = await postRequest(url, {'token': token, ...body});
+    var response = await postRequest(url, {'token': token, ...body}, catchError: false);
     var json = jsonDecode(response.body);
 
     if (response.statusCode == 401) {
-      error('Book session expired');
+      if (json['error'] == 'Expired token') {
+        error('Book session expired');
+      } else {
+        error('Invalid book token');
+      }
       return null;
     }
 
@@ -70,17 +71,17 @@ class RequestService {
 
   /// Makes a post request with reCaptcha enabled. This should be used with
   /// every request.
-  Future<Response> postRequest(String url, Map<String, dynamic> body) async {
+  Future<Response> postRequest(String url, Map<String, dynamic> body, {bool catchError = true}) async {
     var captchaToken = await _captchaVerification.getCaptchaToken();
 
     var response = await http.post(url,
         body: jsonEncode({'captchaToken': captchaToken, ...body}));
     var json = jsonDecode(response.body);
 
-    if (json.containsKey('error')) {
+    if (catchError && json.containsKey('error')) {
       print('Error on request to "$url":');
       print(json['error']);
-      throw json['error'];
+      throw Exception(json['error']);
     }
 
     // If this was a request that responded with a token header, set it as the
