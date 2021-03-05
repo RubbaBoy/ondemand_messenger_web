@@ -1,7 +1,6 @@
 
 import 'dart:async';
 import 'dart:js';
-import 'dart:js_util' as js;
 
 import 'package:angular/angular.dart';
 
@@ -12,10 +11,17 @@ class CaptchaVerification {
   Completer waiting = Completer();
 
   void init() {
-    context['captchaReady'] = () {
-      ready = true;
-      waiting.complete();
-    };
+    Timer.periodic(Duration(milliseconds: 500), (timer) {
+      var cap = context['grecaptcha'] as JsObject;
+      if (cap != null) {
+        cap.callMethod('ready', [() {
+          ready = true;
+          waiting.complete();
+        }]);
+
+        timer.cancel();
+      }
+    });
   }
 
   Future<String> getCaptchaToken() async {
