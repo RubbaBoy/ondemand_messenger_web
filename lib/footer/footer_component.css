@@ -1,0 +1,25 @@
+:host {
+    margin-top: calc(-50px - 2rem) !important; /* - rem from padding */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer {
+    width: 100%;
+    z-index: 1;
+
+    /* Added for MOBILE */
+    text-align: center;
+}
+
+.footer > a {
+    height: 50px;
+    line-height: 50px;
+    left: 0;
+}
+
+.separator {
+    height: 50px;
+    margin: 0 5px;
+}

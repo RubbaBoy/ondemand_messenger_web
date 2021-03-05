@@ -1,31 +1,27 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:html';
+import 'dart:js';
+
+import 'package:LakWebsite/phone_pipe.dart';
 import 'package:LakWebsite/primary_routes.dart';
 import 'package:LakWebsite/services/captcha_verification.dart';
 import 'package:LakWebsite/services/request_service.dart';
+import 'package:LakWebsite/utils/cookie_util.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
-import 'footer/footer_component.dart';
 
 @Component(
-  selector: 'app',
-  styleUrls: ['app_component.css'],
-  templateUrl: 'app_component.html',
+  selector: 'tos',
+  styleUrls: ['../info_style.css'],
+  templateUrl: 'tos_component.html',
   directives: [
     coreDirectives,
     routerDirectives,
-    FooterComponent
   ],
-  providers: [
-    ClassProvider(CaptchaVerification),
-    ClassProvider(RequestService),
-  ],
-  exports: [Routes],
+  exports: [RoutePaths],
+  providers: [],
   pipes: [],
 )
-class AppComponent implements OnInit {
-
-  @override
-  void ngOnInit() {
-
-  }
-
+class TosComponent {
 }

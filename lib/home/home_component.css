@@ -1,0 +1,32 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.separator {
+    border-right: 1px solid #ced4da;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 0 9px 0 5px;
+}
+
+.top-align {
+    margin-top: 25vh;
+    margin-bottom: auto;
+}
+
+.alert {
+    cursor: pointer;
+}
+
+.alert-padding {
+    padding: .75rem 4rem .75rem 1.25rem;
+    display: inline-block;
+    width: calc(100% - 60px);
+}
+
+.alert-close {
+    padding: .75rem 1.25rem;
+}

@@ -1,0 +1,12 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.top-align {
+    margin-top: 15vh;
+    margin-bottom: auto;
+    padding-bottom: calc(50px + 2rem);
+}
