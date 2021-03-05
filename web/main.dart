@@ -5,7 +5,7 @@ import 'package:angular_router/angular_router.dart';
 import 'main.template.dart' as self;
 
 @GenerateInjector(
-  routerProvidersHash, // You can use routerProviders in production
+  routerProviders, // routerProvidersHash for development, routerProviders for prod
 )
 final InjectorFactory injector = self.injector$Injector;
 
